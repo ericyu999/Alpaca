@@ -5,11 +5,6 @@ Handles all dialogs
 
 import gi
 from gi.repository import Gtk, Gio, Adw, GLib
-import gettext
-
-# Set up gettext for translations
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
 
 button_appearance={
     'suggested': Adw.ResponseAppearance.SUGGESTED,

@@ -4,11 +4,6 @@ Holds a few constant values that can be re-used all over the application.
 """
 
 import os
-import gettext
-
-# Set up gettext for translations
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
 
 # Big thanks to everyone contributing translations.
 # These translators will be shown inside of the app under

@@ -31,10 +31,7 @@ import logging
 import time
 import requests
 import sys
-try:
-    import icu
-except ImportError:
-    icu = None
+import icu
 import tempfile
 import numpy as np
 
@@ -60,16 +57,16 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-# Set up gettext for translations at module level
-localedir = os.path.join(source_dir, 'locale')
-gettext.bindtextdomain('com.jeffser.Alpaca', localedir)
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
-
 @Gtk.Template(resource_path='/com/jeffser/Alpaca/window.ui')
 class AlpacaWindow(Adw.ApplicationWindow):
 
     __gtype_name__ = 'AlpacaWindow'
+
+    localedir = os.path.join(source_dir, 'locale')
+
+    gettext.bindtextdomain('com.jeffser.Alpaca', localedir)
+    gettext.textdomain('com.jeffser.Alpaca')
+    _ = gettext.gettext
 
     #Variables
     attachments = {}
@@ -547,10 +544,8 @@ class AlpacaWindow(Adw.ApplicationWindow):
     @Gtk.Template.Callback()
     def closing_app(self, user_data):
         def close():
-            selected_row = self.chat_list_box.get_selected_row()
-            if selected_row:
-                selected_chat = selected_row.get_name()
-                SQL.insert_or_update_preferences({'selected_chat': selected_chat})
+            selected_chat = self.chat_list_box.get_selected_row().get_name()
+            SQL.insert_or_update_preferences({'selected_chat': selected_chat})
             self.get_current_instance().stop()
             if self.message_dictated:
                 self.message_dictated.footer.popup.tts_button.set_active(False)
@@ -984,10 +979,7 @@ class AlpacaWindow(Adw.ApplicationWindow):
         for i, lan in enumerate(SPEACH_RECOGNITION_LANGUAGES):
             if lan == selected_language:
                 selected_index = i
-            if icu:
-                string_list.append('{} ({})'.format(icu.Locale(lan).getDisplayLanguage(icu.Locale(lan)).title(), lan))
-            else:
-                string_list.append('{} ({})'.format(lan.upper(), lan))
+            string_list.append('{} ({})'.format(icu.Locale(lan).getDisplayLanguage(icu.Locale(lan)).title(), lan))
 
         self.mic_language_combo.set_model(string_list)
         self.mic_language_combo.set_selected(selected_index)

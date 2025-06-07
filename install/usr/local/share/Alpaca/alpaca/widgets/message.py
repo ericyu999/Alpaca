@@ -5,18 +5,12 @@ Handles the message widget
 
 import gi
 from gi.repository import Gtk, Gio, Adw, GLib, Gdk, GdkPixbuf
-import os, datetime, threading, sys, base64, logging, gettext
-from ..constants import TTS_VOICES, source_dir
+import os, datetime, threading, sys, base64, logging
+from ..constants import TTS_VOICES
 from ..sql_manager import convert_model_name, Instance as SQL
 from . import model_manager, attachments, blocks, dialog
 
 logger = logging.getLogger(__name__)
-
-# Set up gettext for translations
-localedir = os.path.join(source_dir, 'locale')
-gettext.bindtextdomain('com.jeffser.Alpaca', localedir)
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
 
 class OptionPopup(Gtk.Popover):
     __gtype_name__ = 'AlpacaMessagePopup'

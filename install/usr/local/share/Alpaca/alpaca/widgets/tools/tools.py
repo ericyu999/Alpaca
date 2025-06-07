@@ -3,16 +3,11 @@
 from gi.repository import Adw, Gtk
 
 import datetime, time, random, requests, json, os
-import gettext
 from html2text import html2text
 
 from .. import terminal, attachments
 from ...constants import data_dir
 from ...sql_manager import generate_uuid, Instance as SQL
-
-# Set up gettext for translations
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
 
 class Base(Adw.ActionRow):
     __gtype_name__ = 'AlpacaToolRow'

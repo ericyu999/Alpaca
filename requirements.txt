@@ -1,0 +1,6 @@
+requests
+pillow
+youtube-transcript-api
+html2text
+pydbus
+matplotlib 

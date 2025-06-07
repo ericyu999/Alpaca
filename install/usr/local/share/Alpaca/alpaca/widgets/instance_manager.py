@@ -7,12 +7,7 @@ import gi
 from gi.repository import Adw, Gtk, GLib
 
 import openai, requests, json, logging, os, shutil, subprocess, threading, re
-import gettext
 from pydantic import BaseModel
-
-# Set up gettext for translations
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
 
 from ..ollama_models import OLLAMA_MODELS
 from . import dialog, tools
@@ -888,48 +883,6 @@ class Anthropic(BaseOpenAI):
     instance_type_display = 'Anthropic'
     instance_url = 'https://api.anthropic.com/v1/'
     limitations = ('no-system-messages')
-
-    def __init__(self, data:dict={}):
-        # Initialize parent class first
-        super().__init__(data)
-        # Override the client to use Anthropic's API correctly
-        # The OpenAI client should work with Anthropic's OpenAI-compatible endpoint
-        self.client = openai.OpenAI(
-            base_url=self.instance_url.replace('\n', ''),
-            api_key=self.api_key if self.api_key else 'NO_KEY'
-        )
-
-    def get_local_models(self) -> list:
-        try:
-            # Use direct requests with correct Anthropic authentication headers
-            response = requests.get(
-                'https://api.anthropic.com/v1/models',
-                headers={
-                    'x-api-key': self.api_key,
-                    'anthropic-version': '2023-06-01',
-                    'content-type': 'application/json'
-                }
-            )
-            if response.status_code == 200:
-                models_data = response.json()
-                models = []
-                for model in models_data.get('data', []):
-                    if model.get('id'):
-                        models.append({'name': model.get('id'), 'display_name': model.get('name', model.get('id'))})
-                return models
-            else:
-                logger.error(f"Anthropic models API error: {response.status_code} - {response.text}")
-                return []
-        except Exception as e:
-            dialog.simple_error(
-                parent = window,
-                title = _('Instance Error'),
-                body = _('Could not retrieve added models'),
-                error_log = e
-            )
-            logger.error(e)
-            window.instance_listbox.unselect_all()
-            return []
 
 class OpenRouter(BaseOpenAI):
     instance_type = 'openrouter'

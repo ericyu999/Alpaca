@@ -10,12 +10,7 @@ if sys.platform != 'win32':
     from gi.repository import Vte
 from gi.repository import Gtk, Pango, GLib, Gdk, Gio, Adw
 import os
-import gettext
 from ..constants import data_dir
-
-# Set up gettext for translations
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
 
 commands = {
     'python': [

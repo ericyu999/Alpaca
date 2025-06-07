@@ -24,22 +24,15 @@ import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 from gi.repository import Gtk, Gio, Adw
-import os
 
 from .constants import TRANSLATORS, cache_dir, data_dir, config_dir, source_dir
-
-# Load GResource file before importing window modules
-resource_path = os.path.join(source_dir, 'alpaca.gresource')
-if os.path.exists(resource_path):
-    resource = Gio.Resource.load(resource_path)
-    resource._register()
-
 from .window import AlpacaWindow
 from .quick_ask import QuickAskWindow
 from .sql_manager import Instance as SQL
 
 SQL.initialize()
 
+import os
 os.environ["TORCH_HOME"] = os.path.join(data_dir, "torch")
 
 import sys
@@ -123,14 +116,25 @@ class AlpacaApplication(Adw.Application):
         self.set_accels_for_action("win.show-help-overlay", ['<primary>slash'])
         self.version = version
         self.args = parser.parse_args()
-        if sys.platform in ('linux', 'linux2') and not os.environ.get('ALPACA_NO_DBUS'):
+        if sys.platform in ('linux', 'linux2'):
             try:
                 SessionBus().publish('com.jeffser.Alpaca', AlpacaService(self))
-                print("D-Bus service registered successfully")
-            except Exception as e:
-                print(f"D-Bus service registration failed: {e}")
-                # For development, we'll skip D-Bus functionality
-                print("Continuing without D-Bus service...")
+            except:
+                # The app is probably already running so let's use dbus to interact if needed
+                app_service = SessionBus().get("com.jeffser.Alpaca")
+                if app_service.IsRunning() == 'yeah':
+                    app_service.Present()
+                else:
+                    raise Exception('Alpaca not running')
+                if self.args.new_chat:
+                    app_service.Create(self.args.new_chat)
+                elif self.args.select_chat:
+                    app_service.Open(self.args.select_chat)
+                elif self.args.ask:
+                    app_service.Ask(self.args.ask)
+                elif self.args.quick_ask:
+                    app_service.PresentAsk()
+                sys.exit(0)
 
     def get_quick_ask_app(self):
         if not self.quick_ask_app:
@@ -241,18 +245,15 @@ class QuickAskApplication(Adw.Application):
         return win
 
 def main(version):
-    print(f"Starting Alpaca version {version}")
     logging.basicConfig(
         format="%(levelname)s\t[%(filename)s | %(funcName)s] %(message)s",
         level=logging.INFO,
         handlers=[logging.StreamHandler(stream=sys.stdout)]
     )
 
-    print("Setting up directories...")
     for directory in (cache_dir, data_dir, config_dir, source_dir):
         if not os.path.isdir(directory):
             os.mkdir(directory)
-    print("Directories ready")
 
     parser.add_argument('--version', action='store_true', help='Display the application version and exit.')
     parser.add_argument('--new-chat', type=str, metavar='"CHAT"', help="Start a new chat with the specified title.")
@@ -280,18 +281,7 @@ def main(version):
 
     logger.info(f"Alpaca version: {version}")
 
-    print("Creating application...")
     if args.quick_ask or args.ask:
-        print("Starting QuickAsk application")
         return QuickAskApplication(version).run([])
     else:
-        print("Starting main application")
         return AlpacaApplication(version).run([])
-
-if __name__ == '__main__':
-    import sys
-    # Remove the version argument from sys.argv before argparse sees it
-    version = '6.1.7'
-    if len(sys.argv) > 1 and not sys.argv[1].startswith('-'):
-        version = sys.argv.pop(1)
-    main(version)

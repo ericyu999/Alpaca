@@ -6,15 +6,10 @@ Handles the chat widget
 import gi
 from gi.repository import Gtk, Gio, Adw, Gdk, GLib
 import logging, os, datetime, random, json, threading
-import gettext
 from ..constants import SAMPLE_PROMPTS, cache_dir
 from ..sql_manager import generate_uuid, generate_numbered_name, Instance as SQL
 from . import dialog
 from .message import Message
-
-# Set up gettext for translations
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
 
 logger = logging.getLogger(__name__)
 

@@ -1,11 +1,6 @@
 # notebook_tools.py
 
 from gi.repository import GLib
-import gettext
-
-# Set up gettext for translations
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
 
 class Base:
     def get_tool(self) -> dict:

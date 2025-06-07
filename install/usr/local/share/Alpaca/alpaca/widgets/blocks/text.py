@@ -7,15 +7,6 @@ import gi
 from gi.repository import GLib, Gtk
 
 import re
-import os
-import gettext
-
-# Set up gettext for translations
-from ...constants import source_dir
-localedir = os.path.join(source_dir, 'locale')
-gettext.bindtextdomain('com.jeffser.Alpaca', localedir)
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
 
 def markdown_to_pango(text:str) -> str:
     """Converts Markdown text to a limited version of PangoMarkup"""

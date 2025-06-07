@@ -5,18 +5,7 @@ Handles models
 
 import gi
 from gi.repository import Gtk, Gio, Adw, GLib, Gdk, GdkPixbuf, GObject
-import logging, os, datetime, threading, sys, glob, base64, hashlib
-import gettext
-
-try:
-    import icu
-except ImportError:
-    icu = None
-    
-# Set up gettext for translations
-gettext.textdomain('com.jeffser.Alpaca')
-_ = gettext.gettext
-
+import logging, os, datetime, threading, sys, glob, icu, base64, hashlib
 from ..constants import STT_MODELS, TTS_VOICES, data_dir, cache_dir
 from ..sql_manager import convert_model_name, Instance as SQL
 from . import dialog, attachments
@@ -521,7 +510,7 @@ class LocalModelPage(Gtk.Box):
             if not categories:
                 categories = available_models.get(self.model.data.get('details', {}).get('parent_model', '').split(':')[0], {}).get('categories', [])
                 languages = available_models.get(self.model.data.get('details', {}).get('parent_model', '').split(':')[0], {}).get('languages', [])
-            for category in set(categories + (['language:' + icu.Locale(lan).getDisplayLanguage(icu.Locale(lan)).title() for lan in languages] if icu else ['language:' + lan.upper() for lan in languages])):
+            for category in set(categories + ['language:' + icu.Locale(lan).getDisplayLanguage(icu.Locale(lan)).title() for lan in languages]):
                 if category not in ('small', 'medium', 'big', 'huge'):
                     categories_box.append(CategoryPill(category, True))
 
@@ -893,7 +882,7 @@ class AvailableModel(Gtk.Box):
                 max_children_per_line=3,
                 selection_mode=0
             )
-            for language in (['language:' + icu.Locale(lan).getDisplayLanguage(icu.Locale(lan)).title() for lan in self.data.get('languages', [])] if icu else ['language:' + lan.upper() for lan in self.data.get('languages', [])]):
+            for language in ['language:' + icu.Locale(lan).getDisplayLanguage(icu.Locale(lan)).title() for lan in self.data.get('languages', [])]:
                 languages_container.append(CategoryPill(language, True))
             languages_scroller = Gtk.ScrolledWindow(
                 child=languages_container,

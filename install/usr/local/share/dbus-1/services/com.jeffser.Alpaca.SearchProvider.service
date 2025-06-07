@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=com.jeffser.Alpaca.SearchProvider
+Exec=/usr/local/bin/alpaca_search_provider
